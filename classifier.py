@@ -29,12 +29,17 @@ class NBClassifier:
     nbclassifier = None
     candidate_name = None
     predicted = None
+    training_data = None
+    training_labels = None
 
-    def __init__(self, candidate_name):
+    def __init__(self, training_data, training_labels, candidate_name):
+        self.training_data = training_data
+        self.training_labels = training_labels
         self.candidate_name = candidate_name
+        self.train(training_data,training_labels)
 
-    def train(self, train_data, train_labels):
-        self.nbclassifier = MultinomialNB().fit(train_data, train_labels)
+    def train(self):
+        self.nbclassifier = MultinomialNB().fit(self.training_data, self.training_labels)
 
     def test(self, test_data, test_labels):
         # true = []
@@ -49,8 +54,10 @@ class NBClassifier:
         # report_results(accuracy, precision, recall, fscore)
         self.predicted = pred
 
-    def cross_validation(self, train_data, train_labels):
+    def cross_validation(self):
 
+        train_data = self.training_data
+        train_labels = self.training_labels
         predictor = MultinomialNB()
 
         num_labels = len(get_unique(train_labels))
@@ -87,19 +94,24 @@ class SVMClassifier:
     svmclassifier = None
     candidate_name = None
     predicted = None
+    training_data = None
+    training_labels = None
 
-    def __init__(self, candidate_name):
+    def __init__(self, training_data, training_labels, candidate_name):
+        self.training_data = training_data
+        self.training_labels = training_labels
         self.candidate_name = candidate_name
+        self.train(training_data, training_labels)
 
-    def train(self, train_data, train_labels):
-        self.svmclassifier = LinearSVC().fit(train_data, train_labels)
+    def train(self):
+        self.svmclassifier = LinearSVC().fit(self.training_data, self.training_labels)
 
     def test(self, test_data, test_labels):
         # true = []
         pred = []
         for idx, i in enumerate(test_labels):
             # true.append(i)
-            pred.append(self.nbclassifier.predict(test_data[idx]))
+            pred.append(self.svmclassifier.predict(test_data[idx]))
         # accuracy = accuracy_score(true, pred)
         # precision = precision_score(true, pred, average=None)
         # recall = recall_score(true, pred, average=None)
@@ -109,6 +121,8 @@ class SVMClassifier:
 
     def cross_validation(self, train_data, train_labels):
 
+        train_data = self.training_data
+        train_labels = self.training_labels
         predictor = LinearSVC()
 
         num_labels = len(get_unique(train_labels))
