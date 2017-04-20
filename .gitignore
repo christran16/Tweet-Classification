@@ -42,6 +42,7 @@ $RECYCLE.BIN/
 Presentation1.pptx
 Presentation1.pptx.gslidesx
 ignore.py
+*.gslidesx
 
 # Directories potentially created on remote AFP share
 .AppleDB
@@ -49,3 +50,4 @@ ignore.py
 Network Trash Folder
 Temporary Items
 .apdisk
+Untitled presentation.gslidesx

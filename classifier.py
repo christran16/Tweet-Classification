@@ -1,6 +1,6 @@
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import LinearSVC
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 import numpy as np
 
@@ -25,8 +25,8 @@ def get_unique(labels):
 
 
 class NBClassifier:
-
     nbclassifier = None
+    cvclassifier = None
     candidate_name = None
     predicted = None
     training_data = None
@@ -36,10 +36,12 @@ class NBClassifier:
         self.training_data = training_data
         self.training_labels = training_labels
         self.candidate_name = candidate_name
-        self.train(training_data,training_labels)
+        self.cvclassifier = MultinomialNB()
+        self.nbclassifier = MultinomialNB()
+        self.train()
 
     def train(self):
-        self.nbclassifier = MultinomialNB().fit(self.training_data, self.training_labels)
+        self.nbclassifier.fit(self.training_data, self.training_labels)
 
     def test(self, test_data, test_labels):
         # true = []
@@ -58,7 +60,7 @@ class NBClassifier:
 
         train_data = self.training_data
         train_labels = self.training_labels
-        predictor = MultinomialNB()
+        predictor = self.cvclassifier
 
         num_labels = len(get_unique(train_labels))
         accuracy = 0
@@ -66,8 +68,9 @@ class NBClassifier:
         recall = np.zeros(num_labels)
         fscore = np.zeros(num_labels)
         num_folds = 10
-        k_fold = KFold(n_splits=num_folds)
-        for train_indices, test_indices in k_fold.split(train_data):
+        # k_fold = KFold(n_splits=num_folds)
+        k_fold = StratifiedKFold(n_splits=num_folds)
+        for train_indices, test_indices in k_fold.split(train_data, train_labels):
             x_train = train_data[train_indices]
             y_train = [train_labels[i] for i in train_indices]
 
@@ -90,8 +93,8 @@ class NBClassifier:
 
 
 class SVMClassifier:
-
     svmclassifier = None
+    cvclassifier = None
     candidate_name = None
     predicted = None
     training_data = None
@@ -101,10 +104,12 @@ class SVMClassifier:
         self.training_data = training_data
         self.training_labels = training_labels
         self.candidate_name = candidate_name
-        self.train(training_data, training_labels)
+        self.cvclassifier = LinearSVC()
+        self.svmclassifier = LinearSVC()
+        self.train()
 
     def train(self):
-        self.svmclassifier = LinearSVC().fit(self.training_data, self.training_labels)
+        self.svmclassifier.fit(self.training_data, self.training_labels)
 
     def test(self, test_data, test_labels):
         # true = []
@@ -119,11 +124,11 @@ class SVMClassifier:
         # report_results(accuracy, precision, recall, fscore)
         self.predicted = pred
 
-    def cross_validation(self, train_data, train_labels):
+    def cross_validation(self):
 
         train_data = self.training_data
         train_labels = self.training_labels
-        predictor = LinearSVC()
+        predictor = self.cvclassifier
 
         num_labels = len(get_unique(train_labels))
         accuracy = 0
@@ -131,8 +136,9 @@ class SVMClassifier:
         recall = np.zeros(num_labels)
         fscore = np.zeros(num_labels)
         num_folds = 10
-        k_fold = KFold(n_splits=num_folds)
-        for train_indices, test_indices in k_fold.split(train_data):
+        # k_fold = KFold(n_splits=num_folds)
+        k_fold = StratifiedKFold(n_splits=num_folds)
+        for train_indices, test_indices in k_fold.split(train_data, train_labels):
             x_train = train_data[train_indices]
             y_train = [train_labels[i] for i in train_indices]
 

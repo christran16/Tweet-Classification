@@ -14,8 +14,24 @@ if __name__ == '__main__':
     obama_data, obama_labels = read_excel_file(training_data, 'Obama')
     romney_data, romney_labels = read_excel_file(training_data, 'Romney')
 
+    print('NB Results')
     obama_nb = classifier.NBClassifier(obama_data, obama_labels, "Obama")
     obama_nb.cross_validation()
+    print()
+    romney_nb = classifier.NBClassifier(romney_data, romney_labels, "Romney")
+    romney_nb.cross_validation()
+
+    print()
+    print('SVM Results')
+    obama_svm = classifier.SVMClassifier(obama_data, obama_labels, "Obama")
+    obama_svm.cross_validation()
+    print()
+    romney_svm = classifier.SVMClassifier(romney_data, romney_labels, "Romney")
+    romney_svm.cross_validation()
+
+    # Something wrong with romney positive recall and fscore
+    # Also try to manually label
+    # Maybe try stratified sampling
 
     # To test on new data
     # obama_nb.test(obama_test)

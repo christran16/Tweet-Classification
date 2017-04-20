@@ -2,15 +2,16 @@ import xlrd
 import re
 import string
 from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
+from preprocessing import contractions_dict, stops, expand_contractions, replace_emoticons
 
-stops = set(stopwords.words("english"))
+stopwordsnltk = set(stopwords.words("english"))
 punc = set(string.punctuation)
 
 
 def read_excel_file(filename, candidate):
-
     try:
         wb = xlrd.open_workbook(filename)
     except:
@@ -49,10 +50,20 @@ def read_excel_file(filename, candidate):
 
 
 def preprocess_tweet(tweet):
+    pstemmer = PorterStemmer()
+
     tweet = str(tweet)
     tweet = tweet.lower()
+    tweet = pstemmer.stem(tweet)
+    tweet = re.sub('https?://[^\s]+', '', tweet)
     tweet = re.sub(r'#([^\s]+)', r'\1', tweet)
-    tweet = re.sub(r'(<e>|</e>|<a>|</a>|\n)', '', tweet)
+    tweet = re.sub(r'(<e>|</e>|<a>|</a>|\n|!|,|(|)|//)', '', tweet)
+    to_be_removed = ['#', '@', '(', ')', '.', '...', '“', '?', '!', '"', '$', '|', '*', '&', '%', ';', ':', '&amp', '-',
+                     '--', '”', 'â€\x9d', 'ðÿ‘\x8d']
+    for prohibited_symbol in to_be_removed:
+        tweet = tweet.replace(prohibited_symbol, '')
+    tweet = replace_emoticons(tweet)
+    tweet = expand_contractions(tweet)
     tweet = ''.join(ch for ch in tweet if ch not in punc)
     tweet = remove_stopwords(tweet)
 
